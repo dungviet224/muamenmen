@@ -3,6 +3,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+import requests  # Import the requests library
 
 # Function to install colorama if not already installed
 def install_colorama():
@@ -41,7 +42,8 @@ libraries = [
     "pywin32",
     "gitpython",
     "openpyxl",
-    "pyautogui"
+    "pyautogui",
+    "requests"  # Add requests to the list
 ]
 
 def install_requirements():
@@ -78,13 +80,22 @@ def install_requirements():
             print(Fore.RED + Style.BRIGHT + f"[Error during installation: {lib}]")
             sys.exit(1)
 
-def check_main_file_update():
+def check_and_download_main_file():
     # Check if main.py exists
     main_file = Path("main.py")
     if main_file.exists():
         print(Fore.LIGHTBLUE_EX + Style.BRIGHT + "\n[INFO] main.py has been updated successfully.")
     else:
-        print(Fore.LIGHTRED_EX + Style.BRIGHT + "\n[ERROR] main.py not found. Please ensure the file exists.")
+        print(Fore.LIGHTRED_EX + Style.BRIGHT + "\n[ERROR] main.py not found. Downloading...")
+        try:
+            response = requests.get("https://raw.githubusercontent.com/dungviet224/muamenmen/main/main.py")
+            response.raise_for_status()  # Raise an error for bad responses
+            with open(main_file, "wb") as file:
+                file.write(response.content)
+            print(Fore.LIGHTGREEN_EX + Style.BRIGHT + "[Download complete] main.py has been downloaded.")
+        except requests.RequestException as e:
+            print(Fore.RED + Style.BRIGHT + f"[Error downloading main.py: {e}]")
+            sys.exit(1)
 
 def close_message():
     # Print the exit message in a standout color
@@ -96,5 +107,5 @@ def close_message():
 
 if __name__ == "__main__":
     install_requirements()
-    check_main_file_update()
+    check_and_download_main_file()  # Updated function name
     close_message()
