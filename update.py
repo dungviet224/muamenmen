@@ -1,98 +1,87 @@
-import sys
 import os
 import subprocess
+import sys
 import time
-from threading import Thread
-from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QPushButton, QTextEdit,
-                             QLineEdit, QProgressBar, QLabel)
+from pathlib import Path
 
-# Hàm để cài đặt pip nếu chưa có
-def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+# Function to install colorama if not already installed
+def install_colorama():
+    try:
+        import colorama
+    except ImportError:
+        print("Installing colorama...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "colorama"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        import colorama
+    else:
+        import colorama
 
-# Danh sách các thư viện cần cài đặt
+# Install colorama
+install_colorama()
+
+from colorama import init, Fore, Style
+
+init(autoreset=True)
+
+# Define the logo
+logo = r'''
+  _   _  _____ _    ___     ________ _   _  __      _______ ______ _______   _____  _    _ _   _  _____ 
+ | \ | |/ ____| |  | \\ \\   / /  ____| \\ | | \\ \\    / /_   _|  ____|__   __| |  __ \\| |  | | \\ | |/ ____|
+ |  \\| | |  __| |  | |\\ \\_/ /| |__  |  \\| |  \\ \\  / /  | | | |__     | |    | |  | | |  | |  \\| | |  __ 
+ | . ` | | |_ | |  | | \\   / |  __| | . ` |   \\ \\/ /   | | |  __|    | |    | |  | | |  | | . ` | | |_ |
+ | |\\  | |__| | |__| |  | |  | |____| |\\  |    \\  /   _| |_| |____   | |    | |__| | |__| | |\\  | |__| |
+ |_| \\_|\\_____/\\____/   |_|  |______|_| \\_|     \\/   |_____|______|  |_|    |_____/ \\____/|_| \\_|\\_____/                                                                
+'''
+
+# Define the message
+message = "Downloading and installing libraries..."
+
 libraries = [
     "pandas",
     "selenium",
     "PyQt5",
     "Pillow",
     "pyperclip",
-    "pywin32"
+    "pywin32",
+    "gitpython",
+    "openpyxl",
+    "pyautogui"
 ]
+def install_requirements():
 
-# Cài đặt từng thư viện
-for lib in libraries:
-    install(lib)
+    print(Fore.YELLOW + Style.BRIGHT + logo)
+    print(Fore.CYAN + Style.BRIGHT + message)
 
-class GitHubDownloader(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.initUI()
-        self.thread = None
-        self.is_running = False
+    for lib in libraries:
+        try:
+            print(Fore.CYAN + Style.BRIGHT + f"{{lib}}: checking...", end='')
+            sys.stdout.flush()
+            time.sleep(0.5)  # Simulate some delay
 
-    def initUI(self):
-        self.setWindowTitle("GitHub File Downloader")
-        layout = QVBoxLayout()
+            # Check if the library is already installed
+            result = subprocess.run([sys.executable, "-m", "pip", "show", lib], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            if result.returncode == 0:
+                print(Fore.GREEN + Style.BRIGHT + " [already installed.]")
+            else:
+                print(Fore.YELLOW + Style.BRIGHT + " [updating...]", end='')
+                sys.stdout.flush()
+                # Simulate progress
+                for _ in range(3):
+                    sys.stdout.write(Fore.YELLOW + Style.BRIGHT + " .")
+                    sys.stdout.flush()
+                    time.sleep(0.5)
+                print(Fore.GREEN + Style.BRIGHT + " [installation complete.]")
+                subprocess.check_call([sys.executable, "-m", "pip", "install", lib], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except subprocess.CalledProcessError as e:
+            print(Fore.RED + Style.BRIGHT + f"{{lib}}: error during installation.")
+            sys.exit(1)
 
-        self.url_input = QLineEdit(self)
-        self.url_input.setPlaceholderText("Enter GitHub file URL")
-        layout.addWidget(self.url_input)
+def close_message():
+    print(Fore.CYAN + Style.BRIGHT + "Installation complete.")
+    print(Fore.CYAN + Style.BRIGHT + "Press Enter to close this window.")
 
-        self.progress = QProgressBar(self)
-        layout.addWidget(self.progress)
+    # Wait for the user to press Enter to close the window
+    input()
 
-        self.start_button = QPushButton("Start", self)
-        self.start_button.clicked.connect(self.start_download)
-        layout.addWidget(self.start_button)
-
-        self.stop_button = QPushButton("Stop", self)
-        self.stop_button.clicked.connect(self.stop_download)
-        layout.addWidget(self.stop_button)
-
-        self.log_output = QTextEdit(self)
-        self.log_output.setReadOnly(True)
-        layout.addWidget(self.log_output)
-
-        self.time_left_label = QLabel("Time left: N/A")
-        layout.addWidget(self.time_left_label)
-
-        self.setLayout(layout)
-
-    def start_download(self):
-        if not self.is_running:
-            self.is_running = True
-            self.progress.setValue(0)
-            self.log_output.append("Starting download...")
-            self.thread = Thread(target=self.download_files)
-            self.thread.start()
-
-    def stop_download(self):
-        self.is_running = False
-        self.log_output.append("Download stopped.")
-
-    def download_files(self):
-        # Giả lập quá trình tải file
-        total_files = 10  # Giả sử có 10 file cần tải
-        for i in range(total_files):
-            if not self.is_running:
-                break
-            # Giả lập kiểm tra file và sửa lỗi nếu cần
-            time.sleep(1)  # Giả lập thời gian tải file
-            self.progress.setValue((i + 1) * 10)
-            self.log_output.append(f"Downloaded file {i + 1}")
-
-            # Cập nhật thời gian còn lại
-            time_left = (total_files - (i + 1)) * 1  # Giả lập 1 giây cho mỗi file
-            self.time_left_label.setText(f"Time left: {time_left} seconds")
-
-        if self.is_running:
-            self.log_output.append("Download complete.")
-        self.is_running = False
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    downloader = GitHubDownloader()
-    downloader.resize(400, 300)
-    downloader.show()
-    sys.exit(app.exec_())
+if __name__ == "__main__":
+    install_requirements()
+    close_message()
