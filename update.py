@@ -10,7 +10,7 @@ def install_colorama():
     try:
         import colorama
     except ImportError:
-        print("Installing colorama...")
+        
         subprocess.check_call([sys.executable, "-m", "pip", "install", "colorama"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         import colorama
 
@@ -86,7 +86,7 @@ def check_and_download_main_file():
     if main_file.exists():
         print(Fore.LIGHTBLUE_EX + Style.BRIGHT + "\n[INFO] main.py has been updated successfully.")
     else:
-        print(Fore.LIGHTRED_EX + Style.BRIGHT + "\n[ERROR] main.py not found. Downloading...")
+        print(Fore.LIGHTRED_EX + Style.BRIGHT + "\n[INFO] main.py not found. Downloading...")
         try:
             response = requests.get("https://raw.githubusercontent.com/dungviet224/muamenmen/main/main.py")
             response.raise_for_status()  # Raise an error for bad responses
