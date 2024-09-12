@@ -20,18 +20,17 @@ from colorama import init, Fore, Style
 
 init(autoreset=True)
 
-# Define the logo
+# Define the logo with new colors
 logo = r'''
-  _   _  _____ _    ___     ________ _   _  __      _______ ______ _______   _____  _    _ _   _  _____ 
- | \ | |/ ____| |  | \\ \\   / /  ____| \\ | | \\ \\    / /_   _|  ____|__   __| |  __ \\| |  | | \\ | |/ ____|
- |  \\| | |  __| |  | |\\ \\_/ /| |__  |  \\| |  \\ \\  / /  | | | |__     | |    | |  | | |  | |  \\| | |  __ 
- | . ` | | |_ | |  | | \\   / |  __| | . ` |   \\ \\/ /   | | |  __|    | |    | |  | | |  | | . ` | | |_ |
- | |\\  | |__| | |__| |  | |  | |____| |\\  |    \\  /   _| |_| |____   | |    | |__| | |__| | |\\  | |__| |
- |_| \\_|\\_____/\\____/   |_|  |______|_| \\_|     \\/   |_____|______|  |_|    |_____/ \\____/|_| \\_|\\_____/                                                                
+  _  _  ___ _   ___   _____ _  _  __   _____ ___ _____   ___  _   _ _  _  ___ 
+ | \| |/ __| | | \ \ / / __| \| | \ \ / /_ _| __|_   _| |   \| | | | \| |/ __|
+ | .` | (_ | |_| |\ V /| _|| .` |  \ V / | || _|  | |   | |) | |_| | .` | (_ |
+ |_|\_|\___|\___/  |_| |___|_|\_|   \_/ |___|___| |_|   |___/ \___/|_|\_|\___|
+                                                                                                                                         
 '''
 
 # Define the message
-message = "Downloading and installing libraries..."
+message = "[INFO] Downloading and installing libraries...\n"
 
 libraries = [
     "pandas",
@@ -46,44 +45,51 @@ libraries = [
 ]
 
 def install_requirements():
+    # Display the logo and message with different colors
     print(Fore.YELLOW + Style.BRIGHT + logo)
-    print(Fore.CYAN + Style.BRIGHT + message)
+    print(Fore.LIGHTMAGENTA_EX + Style.BRIGHT + message)
+
+    # Header for the update table with new colors
+    print(Fore.LIGHTGREEN_EX + Style.BRIGHT + f"{'Library':<25} | Status")
+    print(Fore.LIGHTGREEN_EX + Style.BRIGHT + "-" * 40)
 
     for lib in libraries:
         try:
-            print(Fore.CYAN + Style.BRIGHT + f"{lib}: checking...", end='')
+            # Align library name and status with brackets, change the colors
+            print(Fore.LIGHTCYAN_EX + Style.BRIGHT + f"[{lib:<20}] ", end='')
             sys.stdout.flush()
             time.sleep(0.5)  # Simulate some delay
 
             # Check if the library is already installed
             result = subprocess.run([sys.executable, "-m", "pip", "show", lib], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             if result.returncode == 0:
-                print(Fore.GREEN + Style.BRIGHT + " [already installed.]")
+                print(Fore.LIGHTGREEN_EX + Style.BRIGHT + "[Already installed]")
             else:
-                print(Fore.YELLOW + Style.BRIGHT + " [installing...]", end='')
+                print(Fore.YELLOW + Style.BRIGHT + "[Installing...]", end='')
                 sys.stdout.flush()
-                # Simulate progress
+                # Simulate progress with yellow dots
                 for _ in range(3):
                     sys.stdout.write(Fore.YELLOW + Style.BRIGHT + " .")
                     sys.stdout.flush()
                     time.sleep(0.5)
                 subprocess.check_call([sys.executable, "-m", "pip", "install", lib], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                print(Fore.GREEN + Style.BRIGHT + " [installation complete.]")
+                print(Fore.LIGHTGREEN_EX + Style.BRIGHT + "[Installation complete]")
         except subprocess.CalledProcessError as e:
-            print(Fore.RED + Style.BRIGHT + f"{lib}: error during installation.")
+            print(Fore.RED + Style.BRIGHT + f"[Error during installation: {lib}]")
             sys.exit(1)
 
 def check_main_file_update():
     # Check if main.py exists
     main_file = Path("main.py")
     if main_file.exists():
-        print(Fore.CYAN + Style.BRIGHT + "main.py has been updated successfully.")
+        print(Fore.LIGHTBLUE_EX + Style.BRIGHT + "\n[INFO] main.py has been updated successfully.")
     else:
-        print(Fore.RED + Style.BRIGHT + "main.py not found. Please ensure the file exists.")
+        print(Fore.LIGHTRED_EX + Style.BRIGHT + "\n[ERROR] main.py not found. Please ensure the file exists.")
 
 def close_message():
-    print(Fore.CYAN + Style.BRIGHT + "All tasks completed.")
-    print(Fore.CYAN + Style.BRIGHT + "Press Enter to close this window.")
+    # Print the exit message in a standout color
+    print(Fore.LIGHTMAGENTA_EX + Style.BRIGHT + "\nAll tasks completed.")
+    print(Fore.LIGHTMAGENTA_EX + Style.BRIGHT + "[Press Enter to close this window]")
 
     # Wait for the user to press Enter to close the window
     input()
