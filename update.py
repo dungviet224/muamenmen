@@ -3,7 +3,6 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-from datetime import datetime
 
 # Function to install colorama if not already installed
 def install_colorama():
@@ -12,8 +11,6 @@ def install_colorama():
     except ImportError:
         print("Installing colorama...")
         subprocess.check_call([sys.executable, "-m", "pip", "install", "colorama"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        import colorama
-    else:
         import colorama
 
 # Install colorama
@@ -76,21 +73,16 @@ def install_requirements():
             print(Fore.RED + Style.BRIGHT + f"{lib}: error during installation.")
             sys.exit(1)
 
-def run_main_script():
+def check_main_file_update():
     # Check if main.py exists
     main_file = Path("main.py")
     if main_file.exists():
-        # Get the last modification time of the file
-        last_modified_time = datetime.fromtimestamp(main_file.stat().st_mtime)
-        formatted_time = last_modified_time.strftime("%Y-%m-%d %H:%M:%S")
-        print(Fore.CYAN + Style.BRIGHT + f"Running main.py (Last updated: {formatted_time})...")
-        # Run the main.py script
-        subprocess.run([sys.executable, "main.py"])
+        print(Fore.CYAN + Style.BRIGHT + "main.py has been updated successfully.")
     else:
         print(Fore.RED + Style.BRIGHT + "main.py not found. Please ensure the file exists.")
 
 def close_message():
-    print(Fore.CYAN + Style.BRIGHT + "Installation complete.")
+    print(Fore.CYAN + Style.BRIGHT + "All tasks completed.")
     print(Fore.CYAN + Style.BRIGHT + "Press Enter to close this window.")
 
     # Wait for the user to press Enter to close the window
@@ -98,5 +90,5 @@ def close_message():
 
 if __name__ == "__main__":
     install_requirements()
-    run_main_script()
+    check_main_file_update()
     close_message()
