@@ -3,7 +3,6 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-import requests  # Import the requests library
 
 # Function to install colorama if not already installed
 def install_colorama():
@@ -13,10 +12,20 @@ def install_colorama():
         subprocess.check_call([sys.executable, "-m", "pip", "install", "colorama"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         import colorama
 
-# Install colorama
+# Function to install requests if not already installed
+def install_requests():
+    try:
+        import requests
+    except ImportError:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "requests"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        import requests
+
+# Install colorama and requests
 install_colorama()
+install_requests()
 
 from colorama import init, Fore, Style
+import requests
 
 init(autoreset=True)
 
@@ -38,8 +47,7 @@ libraries = [
     "pywin32",
     "gitpython",
     "openpyxl",
-    "pyautogui",
-    "requests"
+    "pyautogui"
 ]
 
 def install_requirements():
@@ -91,25 +99,24 @@ def download_main_file():
 def run_main_file():
     try:
         print(Fore.LIGHTCYAN_EX + Style.BRIGHT + "[INFO] Running main.py...")
-        result = subprocess.run([sys.executable, "main.py"])
+        result = subprocess.run([sys.executable, "main.py"], capture_output=True, text=True)
+        
         if result.returncode == 0:
             print(Fore.LIGHTGREEN_EX + Style.BRIGHT + "[INFO] main.py executed successfully.")
             return True
         else:
-            print(Fore.RED + Style.BRIGHT + "[ERROR] main.py failed to execute.")
+            # Print the error output if execution failed
+            print(Fore.RED + Style.BRIGHT + f"[ERROR] main.py execution failed:\n{result.stderr}")
             return False
     except Exception as e:
         print(Fore.RED + Style.BRIGHT + f"[ERROR] Exception occurred: {e}")
         return False
 
-def close_message():
-    print(Fore.LIGHTMAGENTA_EX + Style.BRIGHT + "\nAll tasks completed.")
-    print(Fore.LIGHTMAGENTA_EX + Style.BRIGHT + "[Press Enter to close this window]")
-    input()
-
 if __name__ == "__main__":
     download_main_file()
     if not run_main_file():
         install_requirements()  # Install missing libraries if any
-        run_main_file()  # Try running main.py again after installing libraries
-    close_message()
+        if not run_main_file():  # Try running main.py again after installing libraries
+            print(Fore.RED + Style.BRIGHT + "[ERROR] Failed to run main.py after installing required libraries.")
+            sys.exit(1)
+    sys.exit(0)  # Exit automatically if everything runs successfully
