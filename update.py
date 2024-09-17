@@ -29,7 +29,7 @@ import requests
 
 init(autoreset=True)
 
-# Define the logo with new colors
+# Display the logo first
 logo = r'''
   _  _  ___ _   ___   _____ _  _  __   _____ ___ _____   ___  _   _ _  _  ___ 
  | \| |/ __| | | \ \ / / __| \| | \ \ / /_ _| __|_   _| |   \| | | | \| |/ __|
@@ -37,7 +37,8 @@ logo = r'''
  |_|\_|\___|\___/  |_| |___|_|\_|   \_/ |___|___| |_|   |___/ \___/|_|\_|\___|                                                                                                                                         
 '''
 
-# List of libraries to install
+print(Fore.YELLOW + Style.BRIGHT + logo)
+
 libraries = [
     "pandas",
     "selenium",
@@ -51,36 +52,31 @@ libraries = [
 ]
 
 def install_requirements():
-    # Display the logo and message with different colors
-    print(Fore.YELLOW + Style.BRIGHT + logo)
     print(Fore.LIGHTMAGENTA_EX + Style.BRIGHT + "[INFO] Downloading and installing libraries...\n")
-
-    # Header for the update table with new colors
-    print(Fore.LIGHTGREEN_EX + Style.BRIGHT + f"{'Library':<25} | Status")
-    print(Fore.LIGHTGREEN_EX + Style.BRIGHT + "-" * 40)
-
     missing_libraries = []
 
     for lib in libraries:
         try:
-            print(Fore.LIGHTCYAN_EX + Style.BRIGHT + f"[{lib:<20}] ", end='')
-            sys.stdout.flush()
-
-            # Check if the library is already installed
             result = subprocess.run([sys.executable, "-m", "pip", "show", lib], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            if result.returncode == 0:
-                print(Fore.LIGHTGREEN_EX + Style.BRIGHT + "[Already installed]")
-            else:
+            if result.returncode != 0:
                 missing_libraries.append(lib)
-        except subprocess.CalledProcessError as e:
-            print(Fore.RED + Style.BRIGHT + f"[Error checking {lib}]")
+        except subprocess.CalledProcessError:
+            pass
 
     if missing_libraries:
+        print(Fore.LIGHTCYAN_EX + Style.BRIGHT + f"{'Library':<25} | Status")
+        print(Fore.LIGHTGREEN_EX + Style.BRIGHT + "-" * 40)
+        
         for lib in missing_libraries:
-            print(Fore.YELLOW + Style.BRIGHT + f"[Installing {lib}...]", end='')
+            print(Fore.LIGHTCYAN_EX + Style.BRIGHT + f"[{lib:<20}] ", end='')
             sys.stdout.flush()
-            subprocess.check_call([sys.executable, "-m", "pip", "install", lib], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            print(Fore.LIGHTGREEN_EX + Style.BRIGHT + f"[Installation complete: {lib}]")
+            try:
+                print(Fore.YELLOW + Style.BRIGHT + "[Installing...]", end='')
+                subprocess.check_call([sys.executable, "-m", "pip", "install", lib], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                print(Fore.LIGHTGREEN_EX + Style.BRIGHT + "[Installation complete]")
+            except subprocess.CalledProcessError:
+                print(Fore.RED + Style.BRIGHT + f"[Error during installation: {lib}]")
+                sys.exit(1)
 
 def download_main_file():
     main_file = Path("main.py")
@@ -92,31 +88,30 @@ def download_main_file():
         with open(main_file, "wb") as file:
             file.write(response.content)
         print(Fore.LIGHTGREEN_EX + Style.BRIGHT + "[INFO] main.py has been updated successfully.")
-    except requests.RequestException as e:
-        print(Fore.RED + Style.BRIGHT + f"[Error downloading main.py: {e}]")
+    except requests.RequestException:
+        print(Fore.RED + Style.BRIGHT + "[Error downloading main.py]")
         sys.exit(1)
 
 def run_main_file():
     try:
+        # Running main.py and hiding the error output by redirecting stderr
         print(Fore.LIGHTCYAN_EX + Style.BRIGHT + "[INFO] Running main.py...")
-        result = subprocess.run([sys.executable, "main.py"], capture_output=True, text=True)
-        
+        result = subprocess.run([sys.executable, "main.py"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
         if result.returncode == 0:
             print(Fore.LIGHTGREEN_EX + Style.BRIGHT + "[INFO] main.py executed successfully.")
             return True
         else:
-            # Print the error output if execution failed
-            print(Fore.RED + Style.BRIGHT + f"[ERROR] main.py execution failed:\n{result.stderr}")
+            print(Fore.RED + Style.BRIGHT + "[ERROR] main.py execution failed.")
             return False
-    except Exception as e:
-        print(Fore.RED + Style.BRIGHT + f"[ERROR] Exception occurred: {e}")
+    except Exception:
+        print(Fore.RED + Style.BRIGHT + "[ERROR] Exception occurred while running main.py.")
         return False
 
 if __name__ == "__main__":
-    download_main_file()
-    if not run_main_file():
-        install_requirements()  # Install missing libraries if any
-        if not run_main_file():  # Try running main.py again after installing libraries
-            print(Fore.RED + Style.BRIGHT + "[ERROR] Failed to run main.py after installing required libraries.")
-            sys.exit(1)
-    sys.exit(0)  # Exit automatically if everything runs successfully
+    download_main_file()  # First, download or update main.py
+    if not run_main_file():  # Try to run main.py
+        install_requirements()  # If it fails, install missing libraries
+        run_main_file()  # Try running main.py again after installing libraries
+
+    sys.exit(0)  # Exit the script automatically after completion
