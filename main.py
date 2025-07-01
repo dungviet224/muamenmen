@@ -2,7 +2,6 @@ import sys
 import os
 import json
 import time
-import pyautogui
 import pandas as pd
 import unicodedata
 import threading
@@ -34,28 +33,20 @@ from selenium.common.exceptions import TimeoutException
 from PyQt5.QtWidgets import QLabel
 from PIL import Image
 import io
-import base64
 import random
 import win32clipboard
 import pyperclip
 from selenium.webdriver.common.keys import Keys
-CONFIG_FILE = 'cfg.json'
 from PyQt5.QtGui import QImage, QFont, QIcon
 from selenium.webdriver.common.action_chains import ActionChains
 import requests
-import pkgutil
-import subprocess
 import sys
 import tempfile
 import requests
 from datetime import datetime
 from PyQt5.QtWidgets import QApplication
 # Get all imported modules
-imported_modules = {name for _, name, _ in pkgutil.iter_modules()}
-# Install all the imported modules
-subprocess.run([sys.executable, "-m", "pip", "install"] + list(imported_modules))
-
-
+CONFIG_FILE = 'cfg.json'
 class FacebookGroupSearcher(QWidget):
     def __init__(self):
         super().__init__()
@@ -796,19 +787,28 @@ QFrame[objectName*="Separator"] {
         controls_layout = QVBoxLayout()
         controls_layout.setSpacing(15)
 
-        # Delay setting
-        delay_layout = QHBoxLayout()
-        delay_layout.setSpacing(10)
-        delay_layout.addWidget(QLabel("⏱️ Delay between posts:"))
-        
-        self.delayInput = QLineEdit()
-        self.delayInput.setPlaceholderText("seconds")
-        self.delayInput.setFixedHeight(40)
-        self.delayInput.setFixedWidth(120)
-        delay_layout.addWidget(self.delayInput)
-        
-        delay_layout.addStretch()
-        controls_layout.addLayout(delay_layout)
+        # Delay range setting (random min-max)
+        delay_range_layout = QHBoxLayout()
+        delay_range_layout.setSpacing(10)
+
+        delay_range_layout.addWidget(QLabel("🕓 Random delay (min - max):"))
+
+        self.minDelayInput1 = QLineEdit()
+        self.minDelayInput1.setPlaceholderText("Min")
+        self.minDelayInput1.setFixedHeight(40)
+        self.minDelayInput1.setFixedWidth(80)
+        delay_range_layout.addWidget(self.minDelayInput1)
+        self.minDelayInput1.setText("200")
+        self.maxDelayInput1 = QLineEdit()
+        self.maxDelayInput1.setPlaceholderText("Max")
+        self.maxDelayInput1.setFixedHeight(40)
+        self.maxDelayInput1.setFixedWidth(80)
+        delay_range_layout.addWidget(self.maxDelayInput1)
+        self.maxDelayInput1.setText("350")
+
+        delay_range_layout.addStretch()
+        controls_layout.addLayout(delay_range_layout)
+
 
         # Control buttons
         button_layout = QHBoxLayout()
@@ -1186,8 +1186,10 @@ QFrame[objectName*="Separator"] {
             return
         
         self.postStatusLabel.setText(f'Status: Processing 1/{total_links}')
-        delay = int(self.delayInput.text()) if self.delayInput.text().isdigit() else 0
-        
+        min_val = int(self.minDelayInput1.text() or 200)
+        max_val = int(self.maxDelayInput1.text() or 400)
+        delay = random.randint(min_val, max_val)
+
         # Initialize WebDriver here if needed
 
         
@@ -1660,6 +1662,7 @@ QFrame[objectName*="Separator"] {
 
             try:
                 current_link = self.driver.current_url
+                
                 try:
                     post_button = WebDriverWait(self.driver, 10).until(
                         EC.element_to_be_clickable((By.CSS_SELECTOR, "span[class='x1lliihq x6ikm8r x10wlt62 x1n2onr6']"))
@@ -1706,10 +1709,10 @@ QFrame[objectName*="Separator"] {
                                 return False
 
                         try:
-                            delay = float(self.delaytype.text() or 0.0005)
+                            delay = float(self.delaytype.text() or 0.005)
                         except ValueError:
                             print("⚠️ Invalid delay value, using default 0.0005")
-                            delay = 0.0005
+                            delay = 0.005
                         try:
                             post_content = unicodedata.normalize('NFC', post_content)
                             content_area.click()
@@ -1794,30 +1797,6 @@ QFrame[objectName*="Separator"] {
             except Exception as e:
                 print(f"❌ Error in postContentToGroup: {e}")
                 return False
-    def _handle_discord_notification(self, current_link,cc):
-        """Handle Discord notification with error handling"""
-        try:
-            discord_settings = self.getDiscordSettings()
-            
-            if not discord_settings.get('enabled') or not discord_settings.get('webhook_url'):
-                print("Discord integration disabled or webhook URL not set")
-                return
-            
-            # Apply screenshot delay if configured
-            screenshot_delay = discord_settings.get('screenshot_delay', 0)
-            if screenshot_delay > 0:
-                time.sleep(screenshot_delay)
-            # Take screenshot and send to Discord
-            self.take_screenshot_and_send_discord(
-                link=current_link,
-                status="Đăng bài thành công ✅",
-                order=cc,
-                webhook_url=discord_settings['webhook_url']
-            )
-            
-        except Exception as e:
-            print(f"Error handling Discord notification: {e}")
-
     def _perform_post_actions(self):
         """Perform post-submission actions (like, comment) with error handling"""
         try:
@@ -1842,25 +1821,47 @@ QFrame[objectName*="Separator"] {
         except Exception as e:
             print(f"Error in post-submission actions: {e}")
 
-    def take_screenshot_and_send_discord(self, link, status, order, webhook_url=""):
-        """Chụp màn hình và gửi lên Discord với settings tùy chỉnh"""
+    def _handle_discord_notification(self, current_link,cc):
+        """Handle Discord notification with error handling"""
         try:
-            app = QApplication.instance()
-            if app is None:
-                return
-                
-            screen = app.primaryScreen()
-            screenshot = screen.grabWindow(0)
+            discord_settings = self.getDiscordSettings()
             
-            # Tạo file tạm thời
+            if not discord_settings.get('enabled') or not discord_settings.get('webhook_url'):
+                print("Discord integration disabled or webhook URL not set")
+                return
+            
+            # Apply screenshot delay if configured
+            screenshot_delay = discord_settings.get('screenshot_delay', 0)
+            if screenshot_delay > 0:
+                time.sleep(screenshot_delay)
+            # Take screenshot and send to Discord
+            self.take_screenshot_and_send_discord(
+                link=current_link,
+                status="Đăng bài thành công ✅",
+                order=cc,
+                webhook_url=discord_settings['webhook_url']
+            )
+            
+        except Exception as e:
+            print(f"Error handling Discord notification: {e}")
+
+
+    def take_screenshot_and_send_discord(self, link, status, order, webhook_url=""):
+        """Chụp màn hình cửa sổ Chrome (Selenium) và gửi lên Discord"""
+        try:
+            # Tạo file tạm
             temp_dir = tempfile.gettempdir()
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             temp_file = os.path.join(temp_dir, f"facebook_post_{timestamp}.png")
             
-            # Lưu ảnh
-            screenshot.save(temp_file, "PNG")
+            # Chụp cửa sổ trình duyệt bằng Selenium WebDriver
+            if not self.driver:
+                print("❌ Không tìm thấy WebDriver để chụp ảnh")
+                return
+
+            self.driver.save_screenshot(temp_file)
             
-            # Gửi lên Discord với webhook URL từ settings
+            # Gửi lên Discord
             self.send_to_discord(temp_file, link, status, order, webhook_url)
             
             # Xóa file tạm
@@ -1868,7 +1869,8 @@ QFrame[objectName*="Separator"] {
                 os.remove(temp_file)
                 
         except Exception as e:
-            print(f"Lỗi khi chụp màn hình: {e}")
+            print(f"❌ Lỗi khi chụp màn hình Chrome: {e}")
+
 
     def send_to_discord(self, file_path, link, status, order,  webhook_url=""):
         """Gửi file và thông tin lên Discord webhook với message tùy chỉnh"""
@@ -2073,7 +2075,7 @@ QFrame[objectName*="Separator"] {
             
             # Load trang tìm kiếm
             base_url = f'https://www.facebook.com/search/groups/?q={encoded_query}'
-            base_url += '&filters=eyJwdWJsaWNfZ3JvdXBzOjAiOiJ7XCJuYW1lXCI6XCJwdWJsaWNfZ3JvdXBzXCIsXCJhcmdzXCI6XCJcIn0ifQ%3D%3D'
+            base_url += '&filters=eyJmaWx0ZXJfZ3JvdXBzX2xvY2FsOjAiOiJ7XCJuYW1lXCI6XCJmaWx0ZXJfZ3JvdXBzX2xvY2FsXCIsXCJhcmdzXCI6XCJcIn0iLCJwdWJsaWNfZ3JvdXBzOjAiOiJ7XCJuYW1lXCI6XCJwdWJsaWNfZ3JvdXBzXCIsXCJhcmdzXCI6XCJcIn0ifQ%3D%3D'
             
             self.driver.get(base_url)
             
@@ -2124,7 +2126,7 @@ QFrame[objectName*="Separator"] {
 
                     global_seen_links.add(href)
 
-                    results.append((title, href, members,))
+                    results.append((title, href, members,privacy))
                     new_groups_found += 1
                     groups_found += 1
 
@@ -2263,8 +2265,8 @@ QFrame[objectName*="Separator"] {
             self.scrollDown()
             
             # Cleanup các element cũ để tránh memory leak
-            if len(groups) > 10:
-                for group in groups[:-5]:  # Giữ lại 5 element mới nhất
+            if len(groups) > 20:
+                for group in groups[:-10]:  # Giữ lại 5 element mới nhất
                     try:
                         self.driver.execute_script("arguments[0].remove();", group)
                     except:
