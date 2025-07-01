@@ -783,7 +783,7 @@ QFrame[objectName*="Separator"] {
 
         # Post Controls Group
         controls_group = QGroupBox("🎛️ Điều khiển")
-        controls_group.setMinimumHeight(200)
+        controls_group.setMinimumHeight(300)
         controls_layout = QVBoxLayout()
         controls_layout.setSpacing(15)
 
@@ -899,7 +899,7 @@ QFrame[objectName*="Separator"] {
 
             # Profile Management Group
             profile_group = QGroupBox("👤 Profile Management")
-            profile_group.setMinimumHeight(180)
+            profile_group.setMinimumHeight(250)
             profile_layout = QVBoxLayout()
             profile_layout.setSpacing(15)
             
