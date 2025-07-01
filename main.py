@@ -398,13 +398,13 @@ QFrame[objectName*="Separator"] {
         sidebar_layout.addStretch()
 
         # Action buttons at bottom of sidebar
-        self.clearConsoleButton = QPushButton('🗑️ Clear Console')
+        self.clearConsoleButton = QPushButton('🗑️ xóa kết quả')
         self.clearConsoleButton.setObjectName('secondaryButton')
         self.clearConsoleButton.setMinimumHeight(40)
         self.clearConsoleButton.clicked.connect(self.clearConsole)
         sidebar_layout.addWidget(self.clearConsoleButton)
 
-        self.exportButton = QPushButton('📤 Export Results')
+        self.exportButton = QPushButton('📤 xuất kết quả')
         self.exportButton.setObjectName('actionButton')
         self.exportButton.setMinimumHeight(40)
         self.exportButton.clicked.connect(self.exportResults)
@@ -483,18 +483,18 @@ QFrame[objectName*="Separator"] {
         layout.setContentsMargins(30, 30, 30, 30)
 
         # Search input group
-        search_group = QGroupBox("🔍 Search Configuration")
+        search_group = QGroupBox("🔍 từ khóa")
         search_group.setMinimumHeight(200)
         search_layout = QVBoxLayout()
         search_layout.setSpacing(10)
         
         self.searchBox = QTextEdit()
-        self.searchBox.setPlaceholderText('Enter your search terms here...')
+        self.searchBox.setPlaceholderText('nhập từ khóa ...')
         self.searchBox.setFixedHeight(100)
         search_layout.addWidget(self.searchBox)
 
         self.keywordFilterBox = QLineEdit()
-        self.keywordFilterBox.setPlaceholderText('🔍 Filter results by keywords...')
+        self.keywordFilterBox.setPlaceholderText('🔍tìm kết quả')
         self.keywordFilterBox.setFixedHeight(40)
         self.keywordFilterBox.textChanged.connect(self.filterResults)
         search_layout.addWidget(self.keywordFilterBox)
@@ -541,14 +541,14 @@ QFrame[objectName*="Separator"] {
         control_layout = QHBoxLayout()
         control_layout.setSpacing(20)
         
-        self.startSearchButton = QPushButton('🚀 Start Search')
+        self.startSearchButton = QPushButton('🚀 Bắt đầu tìm')
         self.startSearchButton.setObjectName('actionButton')
         self.startSearchButton.setFixedHeight(50)
         self.startSearchButton.setMinimumWidth(160)
         self.startSearchButton.clicked.connect(self.startSearch)
         control_layout.addWidget(self.startSearchButton)
 
-        self.stopButton = QPushButton('⏹️ Stop Search')
+        self.stopButton = QPushButton('⏹️ Dừng')
         self.stopButton.setObjectName('dangerButton')
         self.stopButton.setFixedHeight(50)
         self.stopButton.setMinimumWidth(160)
@@ -562,12 +562,12 @@ QFrame[objectName*="Separator"] {
         layout.addSpacing(20)
 
         # Results table
-        results_group = QGroupBox("📊 Search Results")
+        results_group = QGroupBox("📊 kết quẩ")
         results_layout = QVBoxLayout()
         
         self.resultTable = QTableWidget()
         self.resultTable.setColumnCount(4)
-        self.resultTable.setHorizontalHeaderLabels(['Title', 'Link', 'Members', 'Post per day'])
+        self.resultTable.setHorizontalHeaderLabels(['Title', 'Link', 'Thành viên', 'note'])
         self.resultTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.resultTable.setEditTriggers(QTableWidget.NoEditTriggers)
         self.resultTable.setAlternatingRowColors(True)
@@ -578,7 +578,7 @@ QFrame[objectName*="Separator"] {
         layout.addWidget(results_group)
 
         # Status
-        self.statusLabel = QLabel('✅ Status: Ready to search')
+        self.statusLabel = QLabel('✅ Status: Sẵn Sàng')
         self.statusLabel.setObjectName('statusLabel')
         self.statusLabel.setFixedHeight(35)
         layout.addWidget(self.statusLabel)
@@ -599,17 +599,17 @@ QFrame[objectName*="Separator"] {
         layout.setContentsMargins(30, 30, 30, 30)
 
         # Post Content Group
-        content_group = QGroupBox("📝 Post Content")
+        content_group = QGroupBox("📝 Nội Dung")
         content_group.setMinimumHeight(350)
         content_layout = QVBoxLayout()
         content_layout.setSpacing(10)
 
         self.postContent = QTextEdit()
-        self.postContent.setPlaceholderText('Write your post content here...')
+        self.postContent.setPlaceholderText('Nhập nội dung')
         self.postContent.setFixedHeight(170)
         content_layout.addWidget(self.postContent)
 
-        self.AI = QPushButton('🤖 AI Rewirte')
+        self.AI = QPushButton('🤖 AI Viết lại')
         self.AI.setObjectName('secondaryButton')
         self.AI.setFixedHeight(45)
         self.AI.setMinimumWidth(200)
@@ -619,12 +619,12 @@ QFrame[objectName*="Separator"] {
         image_layout = QHBoxLayout()
         image_layout.setSpacing(15)
         
-        self.enableImageCheckbox = QCheckBox("🖼️ Attach Image")
+        self.enableImageCheckbox = QCheckBox("🖼️ Thêm Ảnh")
         self.enableImageCheckbox.setFixedHeight(35)
         self.enableImageCheckbox.stateChanged.connect(self.toggleImageSelection)
         image_layout.addWidget(self.enableImageCheckbox)
 
-        self.selectImageButton = QPushButton('📁 Select Image')
+        self.selectImageButton = QPushButton('📁 Chọn Ảnh')
         self.selectImageButton.setObjectName('secondaryButton')
         self.selectImageButton.setFixedHeight(40)
         self.selectImageButton.setMinimumWidth(130)
@@ -635,7 +635,7 @@ QFrame[objectName*="Separator"] {
         image_layout.addStretch()
         content_layout.addLayout(image_layout)
 
-        self.imagePathLabel = QLabel('No image selected')
+        self.imagePathLabel = QLabel('Chưa Chọn')
         self.imagePathLabel.setStyleSheet("color: #888888; font-style: italic;")
         self.imagePathLabel.setFixedHeight(30)
         content_layout.addWidget(self.imagePathLabel)
@@ -644,23 +644,23 @@ QFrame[objectName*="Separator"] {
         layout.addWidget(content_group)
 
         # Interaction Settings Group
-        interaction_group = QGroupBox("💬 Interaction Settings")
+        interaction_group = QGroupBox("💬 hành động khác")
         interaction_group.setMinimumHeight(450)
         interaction_layout = QVBoxLayout()
         interaction_layout.setSpacing(10)
 
         # Like post checkbox
-        self.likePostCheckBox = QCheckBox("👍 Auto-like Posts")
+        self.likePostCheckBox = QCheckBox("👍 Tự like bài viết")
         self.likePostCheckBox.setFixedHeight(35)
         interaction_layout.addWidget(self.likePostCheckBox)
 
         # Comment settings
-        self.commentCheckBox = QCheckBox("💬 Auto-comment on Posts")
+        self.commentCheckBox = QCheckBox("💬 Tự bình luận")
         self.commentCheckBox.setFixedHeight(35)
         self.commentCheckBox.stateChanged.connect(self.toggleCommentInput)
         interaction_layout.addWidget(self.commentCheckBox)
         
-        self.onlyCommentNoPostCheckBox = QCheckBox("💭 Only comment, no post")
+        self.onlyCommentNoPostCheckBox = QCheckBox("💭 Chỉ bình luận không đăng bài")
         self.onlyCommentNoPostCheckBox.setFixedHeight(35)
         interaction_layout.addWidget(self.onlyCommentNoPostCheckBox)
         
@@ -668,7 +668,7 @@ QFrame[objectName*="Separator"] {
         delay_range_layout = QHBoxLayout()
         delay_range_layout.setSpacing(10)
         
-        delay_range_layout.addWidget(QLabel("🕓 Random range (min - max):"))
+        delay_range_layout.addWidget(QLabel("🕓 Số lần bình luận "))
 
         self.minDelayInput = QLineEdit()
         self.minDelayInput.setPlaceholderText("Min")
@@ -692,13 +692,13 @@ QFrame[objectName*="Separator"] {
         interaction_layout.addWidget(self.commentInput)
 
         # Typing speed settings
-        self.enterContentCheckBox = QCheckBox("⌨️ Slow Typing Mode")
+        self.enterContentCheckBox = QCheckBox("⌨️ Viết chậm")
         self.enterContentCheckBox.setFixedHeight(35)
         self.enterContentCheckBox.stateChanged.connect(self.toggledelaytype)
         interaction_layout.addWidget(self.enterContentCheckBox)
 
         self.delaytype = QLineEdit()
-        self.delaytype.setPlaceholderText("Typing delay in milliseconds (default: 5)")
+        self.delaytype.setPlaceholderText("Tốc độ (mặc định là 0.005)")
         self.delaytype.setFixedHeight(40)
         self.delaytype.setDisabled(True)
         interaction_layout.addWidget(self.delaytype)
@@ -707,13 +707,13 @@ QFrame[objectName*="Separator"] {
         layout.addWidget(interaction_group)
 
         # Discord Integration Group
-        discord_group = QGroupBox("🎮 Discord Integration")
+        discord_group = QGroupBox("🎮 Thông báo discord")
         discord_group.setMinimumHeight(300)
         discord_layout = QVBoxLayout()
         discord_layout.setSpacing(10)
 
         # Enable Discord notifications
-        self.enableDiscordCheckBox = QCheckBox("📸 Enable Discord Screenshots")
+        self.enableDiscordCheckBox = QCheckBox("📸 Bật thông báo")
         self.enableDiscordCheckBox.setFixedHeight(35)
         self.enableDiscordCheckBox.setChecked(True)
         self.enableDiscordCheckBox.stateChanged.connect(self.toggleDiscordSettings)
@@ -734,14 +734,14 @@ QFrame[objectName*="Separator"] {
         test_layout = QHBoxLayout()
         test_layout.setSpacing(15)
         
-        self.testDiscordButton = QPushButton('🧪 Test Discord Connection')
+        self.testDiscordButton = QPushButton('🧪 Kiểm tra kết nối discord')
         self.testDiscordButton.setObjectName('secondaryButton')
         self.testDiscordButton.setFixedHeight(45)
         self.testDiscordButton.setMinimumWidth(200)
         self.testDiscordButton.clicked.connect(self.testDiscordConnection)
         test_layout.addWidget(self.testDiscordButton)
         
-        self.discordStatusLabel = QLabel('📡 Status: Not tested')
+        self.discordStatusLabel = QLabel('📡 Status: idk')
         self.discordStatusLabel.setStyleSheet("color: #888888; font-style: italic;")
         self.discordStatusLabel.setFixedHeight(30)
         test_layout.addWidget(self.discordStatusLabel)
@@ -759,13 +759,13 @@ QFrame[objectName*="Separator"] {
         screenshot_options_layout.setSpacing(10)
         
         self.screenshotDelayCheckBox = QCheckBox("⏰ Delay before screenshot")
-        self.screenshotDelayCheckBox.setFixedHeight(35)
+        self.screenshotDelayCheckBox.setFixedHeight(1)
         screenshot_options_layout.addWidget(self.screenshotDelayCheckBox)
         
         self.screenshotDelayInput = QLineEdit()
         self.screenshotDelayInput.setPlaceholderText("seconds")
-        self.screenshotDelayInput.setFixedHeight(40)
-        self.screenshotDelayInput.setFixedWidth(80)
+        self.screenshotDelayInput.setFixedHeight(1)
+        self.screenshotDelayInput.setFixedWidth(1)
         self.screenshotDelayInput.setText("2")
         self.screenshotDelayInput.setDisabled(True)
         screenshot_options_layout.addWidget(self.screenshotDelayInput)
@@ -782,7 +782,7 @@ QFrame[objectName*="Separator"] {
         layout.addWidget(discord_group)
 
         # Post Controls Group
-        controls_group = QGroupBox("🎛️ Post Controls")
+        controls_group = QGroupBox("🎛️ Điều khiển")
         controls_group.setMinimumHeight(200)
         controls_layout = QVBoxLayout()
         controls_layout.setSpacing(15)
@@ -791,7 +791,7 @@ QFrame[objectName*="Separator"] {
         delay_range_layout = QHBoxLayout()
         delay_range_layout.setSpacing(10)
 
-        delay_range_layout.addWidget(QLabel("🕓 Random delay (min - max):"))
+        delay_range_layout.addWidget(QLabel("🕓 Thời gian delay giữa các bài (min - max):"))
 
         self.minDelayInput1 = QLineEdit()
         self.minDelayInput1.setPlaceholderText("Min")
@@ -814,14 +814,14 @@ QFrame[objectName*="Separator"] {
         button_layout = QHBoxLayout()
         button_layout.setSpacing(20)
         
-        self.postButton = QPushButton('🚀 Start Posting')
+        self.postButton = QPushButton('🚀 Đăng')
         self.postButton.setObjectName('actionButton')
         self.postButton.setFixedHeight(50)
         self.postButton.setMinimumWidth(160)
         self.postButton.clicked.connect(self.startPosting)
         button_layout.addWidget(self.postButton)
 
-        self.stopPostButton = QPushButton('⏹️ Stop Posting')
+        self.stopPostButton = QPushButton('⏹️ Dừng')
         self.stopPostButton.setObjectName('dangerButton')
         self.stopPostButton.setFixedHeight(50)
         self.stopPostButton.setMinimumWidth(160)
@@ -835,14 +835,14 @@ QFrame[objectName*="Separator"] {
         file_layout = QHBoxLayout()
         file_layout.setSpacing(20)
         
-        self.loadFileButton = QPushButton('📂 Load Groups File')
+        self.loadFileButton = QPushButton('📂 Mở file group')
         self.loadFileButton.setObjectName('secondaryButton')
         self.loadFileButton.setFixedHeight(45)
         self.loadFileButton.setMinimumWidth(160)
         self.loadFileButton.clicked.connect(self.loadFile)
         file_layout.addWidget(self.loadFileButton)
 
-        self.selectAllCheckBox = QCheckBox("☑️ Select All Groups")
+        self.selectAllCheckBox = QCheckBox("☑️ Chọn tất cả")
         self.selectAllCheckBox.setFixedHeight(35)
         self.selectAllCheckBox.stateChanged.connect(self.selectAll)
         file_layout.addWidget(self.selectAllCheckBox)
@@ -854,7 +854,7 @@ QFrame[objectName*="Separator"] {
         layout.addWidget(controls_group)
 
         # Status
-        self.postStatusLabel = QLabel('✅ Status: Ready to post')
+        self.postStatusLabel = QLabel('✅ Status: Sẵn sàng')
         self.postStatusLabel.setObjectName('statusLabel')
         self.postStatusLabel.setFixedHeight(35)
         layout.addWidget(self.postStatusLabel)
@@ -907,14 +907,14 @@ QFrame[objectName*="Separator"] {
             profile_control_layout = QHBoxLayout()
             profile_control_layout.setSpacing(20)
             
-            self.profileCreationButton = QPushButton('➕ Create New Profile')
+            self.profileCreationButton = QPushButton('➕ Tạo profile mới')
             self.profileCreationButton.setObjectName('actionButton')
             self.profileCreationButton.setFixedHeight(50)
             self.profileCreationButton.setMinimumWidth(200)
             self.profileCreationButton.clicked.connect(self.createNewProfile)
             profile_control_layout.addWidget(self.profileCreationButton)
             
-            self.openCloseBrowserButton = QPushButton('🌐 Open Browser')
+            self.openCloseBrowserButton = QPushButton('🌐 Mở trình duyệt')
             self.openCloseBrowserButton.setObjectName('secondaryButton')
             self.openCloseBrowserButton.setFixedHeight(50)
             self.openCloseBrowserButton.setMinimumWidth(160)
@@ -925,14 +925,14 @@ QFrame[objectName*="Separator"] {
             profile_layout.addLayout(profile_control_layout)
 
  
-            self.startProfileButton = QPushButton('▶️ Start Selected')
+            self.startProfileButton = QPushButton('▶️ Tương tác (khoảng 60 phút)')
             self.startProfileButton.setObjectName('actionButton')
             self.startProfileButton.setFixedHeight(40)
             self.startProfileButton.setMinimumWidth(140)
             self.startProfileButton.clicked.connect(self.run_random_nurture_account)
             profile_control_layout.addWidget(self.startProfileButton)
 
-            self.stopProfileButton = QPushButton('⏸️ Stop Selected')
+            self.stopProfileButton = QPushButton('⏸️ Dừng')
             self.stopProfileButton.setObjectName('actionButton')
             self.stopProfileButton.setFixedHeight(40)
             self.stopProfileButton.setMinimumWidth(140)
@@ -972,7 +972,7 @@ QFrame[objectName*="Separator"] {
             save_layout = QHBoxLayout()
             save_layout.addStretch()
             
-            self.saveSettingsButton = QPushButton('💾 Save All Settings')
+            self.saveSettingsButton = QPushButton('💾 Lưu cài đặt')
             self.saveSettingsButton.setObjectName('actionButton')
             self.saveSettingsButton.setFixedHeight(50)
             self.saveSettingsButton.setMinimumWidth(180)
