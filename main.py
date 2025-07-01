@@ -1653,155 +1653,174 @@ QFrame[objectName*="Separator"] {
             except Exception as e:
                 print(f"Lỗi chung khi thực hiện comment: {e}")
     def postContentToGroup(self,cc):
-            """
-            Posts content to a Facebook group with improved error handling and reliability
-            """
-            if not self.driver:
-                print("❌ Error: WebDriver not initialized")
-                return False
+                """
+                Posts content to a Facebook group with improved error handling and reliability
+                """
+                if not self.driver:
+                    print("❌ Error: WebDriver not initialized")
+                    return False
 
-            try:
-                current_link = self.driver.current_url
-                
                 try:
-                    post_button = WebDriverWait(self.driver, 10).until(
-                        EC.element_to_be_clickable((By.CSS_SELECTOR, "span[class='x1lliihq x6ikm8r x10wlt62 x1n2onr6']"))
-                    )
-                    post_button.click()
-                    time.sleep(3)
-                except TimeoutException:
-                    print("⚠️ Post creation button not found or not clickable")
-                    return False
-                except Exception as e:
-                    print(f"❌ Error clicking post area: {e}")
-                    return False
-
-                # Get post content
-                post_content = self.postContent.toPlainText().strip()
-                if not post_content and not hasattr(self, 'selected_image_path'):
-                    print("⚠️ No content or image to post")
-                    return False
-
-                # Nhập nội dung
-                if post_content:
+                    current_link = self.driver.current_url
+                    
                     try:
-                        content_area = WebDriverWait(self.driver, 10).until(
-                            EC.presence_of_element_located((By.CSS_SELECTOR, "p[class='xdj266r x14z9mp xat24cr x1lziwak x16tdsg8']"))
+                        post_button = WebDriverWait(self.driver, 10).until(
+                            EC.element_to_be_clickable((By.CSS_SELECTOR, "span[class='x1lliihq x6ikm8r x10wlt62 x1n2onr6']"))
                         )
-                        # Dán hình nếu có
-                        if hasattr(self, 'selected_image_path') and os.path.exists(self.selected_image_path):
-                            try:
-                                image = Image.open(rf'{self.selected_image_path}')
-                                output = io.BytesIO()
-                                image.save(output, format='BMP')
-                                data = output.getvalue()[14:]
+                        post_button.click()
+                        time.sleep(3)
+                    except TimeoutException:
+                        print("⚠️ Post creation button not found or not clickable")
+                        return False
+                    except Exception as e:
+                        print(f"❌ Error clicking post area: {e}")
+                        return False
 
-                                win32clipboard.OpenClipboard()
-                                win32clipboard.EmptyClipboard()
-                                win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
-                                win32clipboard.CloseClipboard()
-                                time.sleep(1)
-                                content_area.click()
-                                content_area.send_keys(Keys.CONTROL, 'v')
-                                time.sleep(3)
-                            except Exception as e:
-                                print(f"⚠️ Error attaching image: {e}")
-                                return False
+                    # Get post content
+                    post_content = self.postContent.toPlainText().strip()
+                    if not post_content and not hasattr(self, 'selected_image_path'):
+                        print("⚠️ No content or image to post")
+                        return False
 
+                    # Nhập nội dung
+                    if post_content:
                         try:
-                            delay = float(self.delaytype.text() or 0.005)
-                        except ValueError:
-                            print("⚠️ Invalid delay value, using default 0.0005")
-                            delay = 0.005
-                        try:
-                            post_content = unicodedata.normalize('NFC', post_content)
-                            content_area.click()
-                            time.sleep(0.1)
-                            for char in post_content:
+                            content_area = WebDriverWait(self.driver, 10).until(
+                                EC.presence_of_element_located((By.CSS_SELECTOR, "p[class='xdj266r x14z9mp xat24cr x1lziwak x16tdsg8']"))
+                            )
+                            # Dán hình nếu có
+                            if hasattr(self, 'selected_image_path') and os.path.exists(self.selected_image_path):
                                 try:
-                                    from selenium.webdriver.common.action_chains import ActionChains
-                                    ActionChains(self.driver).send_keys(char).perform()
-                                except Exception:
+                                    image = Image.open(rf'{self.selected_image_path}')
+                                    output = io.BytesIO()
+                                    image.save(output, format='BMP')
+                                    data = output.getvalue()[14:]
+
+                                    win32clipboard.OpenClipboard()
+                                    win32clipboard.EmptyClipboard()
+                                    win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
+                                    win32clipboard.CloseClipboard()
+                                    time.sleep(1)
+                                    content_area.click()
+                                    content_area.send_keys(Keys.CONTROL, 'v')
+                                    time.sleep(3)
+                                except Exception as e:
+                                    print(f"⚠️ Error attaching image: {e}")
+                                    return False
+
+                            try:
+                                delay = float(self.delaytype.text() or 0.005)
+                            except ValueError:
+                                print("⚠️ Invalid delay value, using default 0.0005")
+                                delay = 0.005
+                            try:
+                                post_content = unicodedata.normalize('NFC', post_content)
+                                content_area.click()
+                                time.sleep(0.1)
+                                for char in post_content:
                                     try:
-                                        content_area.send_keys(char)
+                                        from selenium.webdriver.common.action_chains import ActionChains
+                                        ActionChains(self.driver).send_keys(char).perform()
                                     except Exception:
                                         try:
-                                            self.driver.execute_script(
-                                                "arguments[0].value += arguments[1]; arguments[0].dispatchEvent(new Event('input', {bubbles: true}));",
-                                                content_area, char
-                                            )
+                                            content_area.send_keys(char)
                                         except Exception:
-                                            print(f"⚠️ Skipped character: {repr(char)}")
-                                time.sleep(delay)                                
-                        except Exception as e:
-                            pyperclip.copy(post_content)
-                            content_area.click()
-                            content_area.send_keys(Keys.CONTROL + 'v')
-                            time.sleep(1)
-                            print(f"❌ Error typing content slowly: {e}")
+                                            try:
+                                                self.driver.execute_script(
+                                                    "arguments[0].value += arguments[1]; arguments[0].dispatchEvent(new Event('input', {bubbles: true}));",
+                                                    content_area, char
+                                                )
+                                            except Exception:
+                                                print(f"⚠️ Skipped character: {repr(char)}")
+                                    time.sleep(delay)                                
+                            except Exception as e:
+                                pyperclip.copy(post_content)
+                                content_area.click()
+                                content_area.send_keys(Keys.CONTROL + 'v')
+                                time.sleep(1)
+                                print(f"❌ Error typing content slowly: {e}")
+                                return False
+                        except TimeoutException:
+                            print("⚠️ Content area not found")
                             return False
-                    except TimeoutException:
-                        print("⚠️ Content area not found")
-                        return False
-                    except Exception as e:
-                        print(f"❌ Error entering post content: {e}")
+                        except Exception as e:
+                            print(f"❌ Error entering post content: {e}")
+                            return False
+
+                    # Submit bài viết (3 lần thử)
+                    post_submitted = False
+                    max_attempts = 3
+
+                    for attempt in range(1, max_attempts + 1):
+                        try:
+                            print(f"🟡 Attempt {attempt} to submit post...")
+
+                            submit_button = WebDriverWait(self.driver, 5).until(
+                                EC.element_to_be_clickable((By.CSS_SELECTOR,
+                                    "div[aria-label='Đăng'] div[class='html-div xdj266r xat24cr xexx8yu xyri2b x18d9i69 x1c1uobl x6s0dn4 x78zum5 xl56j7k x14ayic xwyz465 x1e0frkt']"))
+                            )
+                            submit_button.click()
+                            time.sleep(5)
+
+                            print(f"✅ Post submitted successfully on attempt {attempt}")
+                            post_submitted = True
+                            break
+
+                        except (TimeoutException, NoSuchElementException):
+                            print(f"⚠️ Submit button not found or not clickable on attempt {attempt}")
+                        except Exception as e:
+                            print(f"❌ Unexpected error on attempt {attempt}: {e}")
+                        time.sleep(2)
+
+                    if not post_submitted:
+                        print("❌ Failed to submit post after all attempts.")
                         return False
 
-                # Submit bài viết (3 lần thử)
-                post_submitted = False
-                max_attempts = 3
+                    print("⏳ Post submitted successfully, performing post-submission actions...")
 
-                for attempt in range(1, max_attempts + 1):
+                    # Kiểm tra submit button sau khi đăng bài
+                    time.sleep(20)  # Đợi một chút để page load
                     try:
-                        print(f"🟡 Attempt {attempt} to submit post...")
-
-                        submit_button = WebDriverWait(self.driver, 5).until(
-                            EC.element_to_be_clickable((By.CSS_SELECTOR,
-                                "div[aria-label='Đăng'] div[class='html-div xdj266r xat24cr xexx8yu xyri2b x18d9i69 x1c1uobl x6s0dn4 x78zum5 xl56j7k x14ayic xwyz465 x1e0frkt']"))
-                        )
-                        submit_button.click()
-                        time.sleep(5)
-
-                        print(f"✅ Post submitted successfully on attempt {attempt}")
-                        post_submitted = True
-                        break
-
-                    except (TimeoutException, NoSuchElementException):
-                        print(f"⚠️ Submit button not found or not clickable on attempt {attempt}")
+                        submit_button_still_present = self.driver.find_elements(By.CSS_SELECTOR,
+                            "div[aria-label='Đăng'] div[class='html-div xdj266r xat24cr xexx8yu xyri2b x18d9i69 x1c1uobl x6s0dn4 x78zum5 xl56j7k x14ayic xwyz465 x1e0frkt']")
+                        
+                        if submit_button_still_present:
+                            print("⚠️ Submit button still present after posting - sending Discord notification immediately")
+                            # Gửi thông báo Discord ngay với status khác
+                            try:
+                                if hasattr(self, '_handle_discord_notification'):
+                                    self._handle_discord_notification(current_link, cc, "Có thể đăng bài thất bại ⚠️")
+                            except Exception as e:
+                                print(f"⚠️ Error during immediate Discord notification: {e}")
+                            return True
+                        else:
+                            print("✅ Submit button disappeared - post likely successful")
                     except Exception as e:
-                        print(f"❌ Unexpected error on attempt {attempt}: {e}")
-                    time.sleep(2)
+                        print(f"⚠️ Error checking submit button presence: {e}")
 
-                if not post_submitted:
-                    print("❌ Failed to submit post after all attempts.")
+                    # Gửi thông báo Discord
+                    try:
+                        if hasattr(self, '_handle_discord_notification'):
+                            self._handle_discord_notification(current_link, cc, "Đăng bài thành công ✅")
+                    except Exception as e:
+                        print(f"⚠️ Error during Discord notification: {e}")
+
+                    # Hành động sau post
+                    try:
+                        if hasattr(self, '_perform_post_actions'):
+                            self._perform_post_actions()
+                    except Exception as e:
+                        print(f"⚠️ Error during post actions: {e}")
+
+                    return True
+
+                except Exception as e:
+                    print(f"❌ Error in postContentToGroup: {e}")
                     return False
-
-                print("⏳ Post submitted successfully, performing post-submission actions...")
-
-                # Gửi thông báo Discord
-                try:
-                    if hasattr(self, '_handle_discord_notification'):
-                        self._handle_discord_notification(current_link,cc)
-                except Exception as e:
-                    print(f"⚠️ Error during Discord notification: {e}")
-
-                # Hành động sau post
-                try:
-                    if hasattr(self, '_perform_post_actions'):
-                        self._perform_post_actions()
-                except Exception as e:
-                    print(f"⚠️ Error during post actions: {e}")
-
-                return True
-
-            except Exception as e:
-                print(f"❌ Error in postContentToGroup: {e}")
-                return False
+        
     def _perform_post_actions(self):
         """Perform post-submission actions (like, comment) with error handling"""
         try:
-            time.sleep(20)  # Wait for post to be fully loaded
-            
             # Comment on the post
             try:
                 self.comment()
@@ -1821,7 +1840,7 @@ QFrame[objectName*="Separator"] {
         except Exception as e:
             print(f"Error in post-submission actions: {e}")
 
-    def _handle_discord_notification(self, current_link,cc):
+    def _handle_discord_notification(self, current_link, cc, status="Đăng bài thành công ✅"):
         """Handle Discord notification with error handling"""
         try:
             discord_settings = self.getDiscordSettings()
@@ -1837,14 +1856,13 @@ QFrame[objectName*="Separator"] {
             # Take screenshot and send to Discord
             self.take_screenshot_and_send_discord(
                 link=current_link,
-                status="Đăng bài thành công ✅",
+                status=status,
                 order=cc,
                 webhook_url=discord_settings['webhook_url']
             )
             
         except Exception as e:
             print(f"Error handling Discord notification: {e}")
-
 
     def take_screenshot_and_send_discord(self, link, status, order, webhook_url=""):
         """Chụp màn hình cửa sổ Chrome (Selenium) và gửi lên Discord"""
@@ -1977,13 +1995,14 @@ QFrame[objectName*="Separator"] {
                 self.minDelayInput.setText(config.get("min", ""))
                 self.postContent.setPlainText(config.get("textpost"))
                 self.selected_image_path = config.get("imgaepath", "")
+                self.discordWebhookInput.setText(config.get("discordurl", ""))
         else:
             self.saveSettings()
 
     def saveSettings(self):
         config = {
             "profile_subfolder": self.profileComboBox.currentText(),
-            # Save additional settings
+            "discordurl": self.discordWebhookInput.text(),
             "like_post_enabled": self.likePostCheckBox.isChecked(),
             "comment_enabled": self.commentCheckBox.isChecked(),
             "comment_text": self.commentInput.toPlainText(),
