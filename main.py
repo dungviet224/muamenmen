@@ -503,32 +503,32 @@ QFrame[objectName*="Separator"] {
         layout.addWidget(search_group)
 
         # Search Filters Group
-        filters_group = QGroupBox("🔧 Search Filters")
-        filters_group.setMinimumHeight(220)
+        filters_group = QGroupBox("")
+        filters_group.setMinimumHeight(1)
         filters_layout = QVBoxLayout()
-        filters_layout.setSpacing(10)
+        filters_layout.setSpacing(1)
 
         # Include keywords filter
         self.filterByKeywordsCheckBox = QCheckBox("✅ Include Groups with Keywords")
         self.filterByKeywordsCheckBox.setFixedHeight(35)
-        filters_layout.addWidget(self.filterByKeywordsCheckBox)
+
 
         self.keywordsInput = QLineEdit()
         self.keywordsInput.setPlaceholderText("Enter keywords to include (comma separated)")
         self.keywordsInput.setFixedHeight(40)
         self.keywordsInput.setDisabled(True)
-        filters_layout.addWidget(self.keywordsInput)
+     
 
         # Exclude keywords filter
         self.excludeKeywordsCheckBox = QCheckBox("❌ Exclude Groups with Keywords")
         self.excludeKeywordsCheckBox.setFixedHeight(35)
-        filters_layout.addWidget(self.excludeKeywordsCheckBox)
+
 
         self.excludeKeywordsInput = QLineEdit()
         self.excludeKeywordsInput.setPlaceholderText("Enter keywords to exclude (comma separated)")
         self.excludeKeywordsInput.setFixedHeight(40)
         self.excludeKeywordsInput.setDisabled(True)
-        filters_layout.addWidget(self.excludeKeywordsInput)
+  
         
         # Connect signals
         self.filterByKeywordsCheckBox.stateChanged.connect(self.toggleFilterByKeywords)
@@ -645,7 +645,7 @@ QFrame[objectName*="Separator"] {
 
         # Interaction Settings Group
         interaction_group = QGroupBox("💬 Interaction Settings")
-        interaction_group.setMinimumHeight(350)
+        interaction_group.setMinimumHeight(450)
         interaction_layout = QVBoxLayout()
         interaction_layout.setSpacing(10)
 
@@ -687,7 +687,7 @@ QFrame[objectName*="Separator"] {
         
         self.commentInput = QTextEdit()
         self.commentInput.setPlaceholderText("Nhập nội dung comment")
-        self.commentInput.setFixedHeight(80)
+        self.commentInput.setFixedHeight(130)
         self.commentInput.setDisabled(True)
         interaction_layout.addWidget(self.commentInput)
 
@@ -708,7 +708,7 @@ QFrame[objectName*="Separator"] {
 
         # Discord Integration Group
         discord_group = QGroupBox("🎮 Discord Integration")
-        discord_group.setMinimumHeight(400)
+        discord_group.setMinimumHeight(300)
         discord_layout = QVBoxLayout()
         discord_layout.setSpacing(10)
 
